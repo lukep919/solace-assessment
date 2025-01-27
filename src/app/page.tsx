@@ -1,6 +1,7 @@
 import db from "@/db";
 import { advocates } from "@/db/schema";
 import SearchForm from "@/components/SearchForm";
+import { sql } from "drizzle-orm";
 
 export default async function Home({
   searchParams
@@ -8,20 +9,17 @@ export default async function Home({
   searchParams: { search: string };
 }) {
   const searchTerm = searchParams.search ?? "";
-  const allAdvocates = await db.select().from(advocates);
-
-  const filteredAdvocates = allAdvocates.filter((advocate) => {
-    const searchString = searchTerm.toLowerCase();
-    return (
-      advocate.firstName.toLowerCase().includes(searchString) ||
-      advocate.lastName.toLowerCase().includes(searchString) ||
-      advocate.city.toLowerCase().includes(searchString) ||
-      advocate.degree.toLowerCase().includes(searchString) ||
-      (advocate.specialties as string[]).some((s) =>
-        s.toLowerCase().includes(searchString)
-      )
-    );
-  });
+  const filteredAdvocates = await (db.select().from(advocates) as any).where(
+    searchTerm
+      ? sql`
+          LOWER(first_name) LIKE ${`%${searchTerm.toLowerCase()}%`} OR
+          LOWER(last_name) LIKE ${`%${searchTerm.toLowerCase()}%`} OR
+          LOWER(city) LIKE ${`%${searchTerm.toLowerCase()}%`} OR
+          LOWER(degree) LIKE ${`%${searchTerm.toLowerCase()}%`} OR
+          LOWER(payload::text) LIKE ${`%${searchTerm.toLowerCase()}%`}
+        `
+      : undefined
+  );
 
   return (
     <main style={{ margin: "24px" }}>
