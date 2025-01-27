@@ -16,7 +16,7 @@ type Advocate = {
 
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
-  const [filter, setFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     console.log("fetching advocates...");
@@ -30,65 +30,68 @@ export default function Home() {
   const filteredAdvocates = useMemo(() => {
     return advocates.filter((advocate) => {
       return (
-        advocate.firstName.toLowerCase().includes(filter.toLowerCase()) ||
-        advocate.lastName.toLowerCase().includes(filter.toLowerCase()) ||
-        advocate.city.toLowerCase().includes(filter.toLowerCase()) ||
-        advocate.degree.toLowerCase().includes(filter.toLowerCase()) ||
+        advocate.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        advocate.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        advocate.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        advocate.degree.toLowerCase().includes(searchTerm.toLowerCase()) ||
         advocate.specialties.some((s) =>
-          s.toLowerCase().includes(filter.toLowerCase())
+          s.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     });
-  }, [advocates, filter]);
+  }, [advocates, searchTerm]);
 
   return (
     <main style={{ margin: "24px" }}>
-      <h1>Solace Advocates</h1>
-      <br />
-      <br />
-      <div>
-        <p>Search</p>
-        <p>
-          Searching for: <span id="search-term">{filter}</span>
+      <h1 className="text-2xl font-bold mb-8">Solace Advocates</h1>
+
+      <div className="mb-8">
+        <label htmlFor="search-term" className="text-lg font-bold mb-2">Search</label>
+        <p className="mb-2">
+          Searching for: {searchTerm}
         </p>
         <input
-          style={{ border: "1px solid black" }}
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          id="search-term"
+          className="border border-gray-300 rounded-md p-2 mr-4"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button onClick={() => setFilter("")} type="button">Reset Search</button>
+        <button className="bg-red-500 text-white px-4 py-2 rounded-md mb-4" onClick={() => setSearchTerm("")} type="button">Reset Search</button>
+
+        <p className="mb-2">
+          Showing {filteredAdvocates.length} results
+        </p>
       </div>
-      <br />
-      <br />
-      <table>
+
+      <table className="w-full table-auto border-collapse">
         <thead>
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>City</th>
-            <th>Degree</th>
-            <th>Specialties</th>
-            <th>Years of Experience</th>
-            <th>Phone Number</th>
+          <tr className="border-gray-200 bg-gray-20">
+            <th className="border p-2">First Name</th>
+            <th className="border p-2">Last Name</th>
+            <th className="border p-2">City</th>
+            <th className="border p-2">Degree</th>
+            <th className="border p-2">Specialties</th>
+            <th className="border p-2">Years of Experience</th>
+            <th className="border p-2">Phone Number</th>
           </tr>
         </thead>
         <tbody>
           {filteredAdvocates.map((advocate) => {
             return (
-              <tr key={advocate.id} style={{ textAlign: "center" }}>
-                <td>{advocate.firstName}</td>
-                <td>{advocate.lastName}</td>
-                <td>{advocate.city}</td>
-                <td>{advocate.degree}</td>
-                <td style={{ textAlign: "left" }}>
+              <tr key={advocate.id} className="border-gray-200 bg-gray-20 text-center">
+                <td className="border p-2">{advocate.firstName}</td>
+                <td className="border p-2">{advocate.lastName}</td>
+                <td className="border p-2">{advocate.city}</td>
+                <td className="border p-2">{advocate.degree}</td>
+                <td className="border p-2 text-left">
                   <ul>
                     {advocate.specialties.map((s) => (
                       <li key={s}>{s}</li>
                     ))}
                   </ul>
                 </td>
-                <td>{advocate.yearsOfExperience}</td>
-                <td>{advocate.phoneNumber}</td>
+                <td className="border p-2">{advocate.yearsOfExperience}</td>
+                <td className="border p-2">{advocate.phoneNumber}</td>
               </tr>
             );
           })}
